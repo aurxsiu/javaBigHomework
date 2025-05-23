@@ -21,7 +21,7 @@ public class ClientChar extends JFrame implements KeyListener {
     private boolean isAnonymous = false; // 是否选择匿名聊天模式
 
     // GUI组件声明
-    private JTextArea jta; // 用于显示聊天信息的文本区域
+    private JPanel messagePanel;
     private JScrollPane jsp; // 滚动面板，用于显示文本区域
     private JPanel jp; // 面板，用于放置输入文本框和发送按钮
     private JTextField jtf; // 输入消息的文本框
@@ -34,19 +34,14 @@ public class ClientChar extends JFrame implements KeyListener {
 
     // 客户端构造函数
     public ClientChar() {
-        jta = new JTextArea(); // 创建文本区域
-        jta.setEditable(false); // 设置文本区域不可编辑
-        jsp = new JScrollPane(jta); // 将文本区域放入滚动面板
-        jp = new JPanel(); // 创建面板
-        jtf = new JTextField(15); // 创建文本输入框，参数为列数
-        jb1 = new JButton("发送信息"); // 创建发送按钮
     }
 
     // 初始化方法，设置GUI界面和连接服务器
     public void init() {
-        jta = new JTextArea(); // 创建文本区域
-        jta.setEditable(false); // 设置文本区域不可编辑
-        jsp = new JScrollPane(jta); // 将文本区域放入滚动面板
+        this.setVisible(true); // 设置窗口可见
+        messagePanel = new JPanel();
+        messagePanel.setLayout(new BoxLayout(messagePanel, BoxLayout.Y_AXIS));
+        jsp = new JScrollPane(messagePanel); // 将文本区域放入滚动面板
         jp = new JPanel(); // 创建面板
         jtf = new JTextField(15); // 创建文本输入框，参数为列数
         jb1 = new JButton("发送信息"); // 创建发送按钮
@@ -117,7 +112,7 @@ public class ClientChar extends JFrame implements KeyListener {
             this.setTitle("聊天室-" + name); // 设置窗口标题
             new Thread(new Receive()).start(); // 创建并启动接收消息的线程
 
-            this.setVisible(true); // 设置窗口可见
+
         } catch (IOException e) {
             e.printStackTrace(); // 打印异常信息
         }
@@ -136,7 +131,7 @@ public class ClientChar extends JFrame implements KeyListener {
                     dos.writeUTF("@" + parts[0] + "：" + parts[1]); // 发送私聊消息给服务器
                     dos.flush(); // 刷新输出流
                 } else {
-                    jta.append("无效的私聊格式: " + str + "\n"); // 显示无效私聊格式提示
+                    addTextMessage("无效的私聊格式: " + str,true);// 显示无效私聊格式提示
                 }
             } else {
                 dos.writeUTF(str); // 发送普通消息给服务器
@@ -147,6 +142,22 @@ public class ClientChar extends JFrame implements KeyListener {
         }
     }
 
+    private void addTextMessage(String text, boolean fromMe) {
+        JPanel panel = new JPanel(new FlowLayout(fromMe ? FlowLayout.RIGHT : FlowLayout.LEFT));
+        JLabel label = new JLabel("<html><p style='width:200px'>" + text + "</p></html>");
+        label.setOpaque(true);
+        label.setBackground(fromMe ? Color.CYAN : Color.LIGHT_GRAY);
+        label.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        panel.add(label);
+        messagePanel.add(panel);
+        refreshChat();
+    }
+
+    private void refreshChat() {
+        messagePanel.revalidate();
+        JScrollBar vertical = jsp.getVerticalScrollBar();
+        SwingUtilities.invokeLater(() -> vertical.setValue(vertical.getMaximum()));
+    }
     // 处理系统命令
     private void handleSystemCommand(String command) {
         try {
@@ -159,14 +170,14 @@ public class ClientChar extends JFrame implements KeyListener {
                 socket.close(); // 关闭套接字
                 System.exit(0); // 退出程序
             } else if (command.equals("@@showanonymous")) { // 如果命令是@@showanonymous，显示当前聊天方式
-                jta.append("当前聊天方式为:" + (isAnonymous ? "匿名" : "实名") + "\n"); // 显示当前聊天方式
+                addTextMessage("当前聊天方式为:" + (isAnonymous ? "匿名" : "实名"),true);// 显示当前聊天方式
             } else if (command.equals("@@anonymous")) { // 如果命令是@@anonymous，切换聊天方式
                 isAnonymous = !isAnonymous; // 切换匿名聊天模式状态
                 dos.writeUTF(command); // 发送命令给服务器
                 dos.flush(); // 刷新输出流
-                jta.append("聊天方式已切换为:" + (isAnonymous ? "匿名" : "实名") + "\n"); // 显示切换后的聊天方式
+                addTextMessage("聊天方式已切换为:" + (isAnonymous ? "匿名" : "实名"),true);
             } else {
-                jta.append("无效的系统命令，请重新输入\n"); // 显示无效系统命令提示
+                addTextMessage("无效的系统命令，请重新输入",true);// 显示无效系统命令提示
             }
         } catch (IOException e) {
             e.printStackTrace(); // 打印异常信息
@@ -203,10 +214,10 @@ public class ClientChar extends JFrame implements KeyListener {
                 while (isConn) { // 循环接收消息，直到连接断开
                     DataInputStream dis = new DataInputStream(socket.getInputStream()); // 获取套接字的输入流
                     String str = dis.readUTF(); // 读取服务器发送的消息
-                    jta.append(str + "\n"); // 将消息显示在文本区域中
+                    addTextMessage(str,false);// 将消息显示在文本区域中
                 }
             } catch (SocketException e) {
-                jta.append("服务器终止" + System.lineSeparator()); // 显示服务器终止消息
+                addTextMessage("服务器终止",true);// 显示服务器终止消息
             } catch (IOException e) {
                 e.printStackTrace(); // 打印异常信息
             }
