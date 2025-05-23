@@ -32,6 +32,10 @@ public class ClientChar extends JFrame implements KeyListener {
     private static final int CONNPORT = 8888; // 连接服务器的端口号
     private DataOutputStream dos = null; // 数据输出流
 
+    public JPanel getMessagePanel() {
+        return messagePanel;
+    }
+
     // 客户端构造函数
     public ClientChar() {
     }
@@ -153,7 +157,7 @@ public class ClientChar extends JFrame implements KeyListener {
         refreshChat();
     }
 
-    private void refreshChat() {
+    public void refreshChat() {
         messagePanel.revalidate();
         JScrollBar vertical = jsp.getVerticalScrollBar();
         SwingUtilities.invokeLater(() -> vertical.setValue(vertical.getMaximum()));
