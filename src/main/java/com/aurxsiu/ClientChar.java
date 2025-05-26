@@ -36,6 +36,14 @@ public class ClientChar extends JFrame implements KeyListener {
         return messagePanel;
     }
 
+    public JPanel getInputPanel(){
+        return jp;
+    }
+
+    public String getName(){
+        return name;
+    }
+
     // 客户端构造函数
     public ClientChar() {
     }

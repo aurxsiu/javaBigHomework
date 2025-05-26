@@ -1,25 +1,24 @@
 package com.aurxsiu;
 
-import javax.swing.*; // 导入用于图形界面的 Swing 库
-import java.awt.*; // 导入用于布局和图形处理的 AWT 库
-import java.awt.event.ActionEvent; // 导入用于处理动作事件的类
-import java.awt.event.ActionListener; // 导入动作事件监听器接口
-import java.awt.event.WindowAdapter; // 导入窗口适配器类，用于处理窗口事件
-import java.awt.event.WindowEvent; // 导入窗口事件类
-import java.io.*; // 导入用于输入输出的类
-import java.net.ServerSocket; // 导入服务器套接字类
-import java.net.Socket; // 导入客户端套接字类
-import java.net.SocketException; // 导入套接字异常类
-import java.text.SimpleDateFormat; // 导入日期格式化类
-import java.util.ArrayList; // 导入数组列表类
-import java.util.Date; // 导入日期类
-import java.util.HashMap; // 导入哈希地图类
-import java.util.Map; // 导入地图接口
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ServerChar extends JFrame {
     private static final int PORT = 8888; // 定义服务器端口号为 8888
 
-    JTextArea jta; // 定义一个文本区域组件，用于显示服务器日志
+    private JTextArea jta; // 定义一个文本区域组件，用于显示服务器日志
     private JPanel south; // 定义南边的面板
     private JLabel jb; // 定义标签用于显示在线人数
     private JButton stopBtn; // 定义停止服务器的按钮
@@ -31,8 +30,12 @@ public class ServerChar extends JFrame {
     private ArrayList<ClientConn> clientConn = new ArrayList<>(); // 用于存储客户端连接的列表
     private int peopleOnline = 0; // 在线人数计数器
 
-    private Map<String, String> users = new HashMap<>(); // 存储用户名和密码的地图
+    private final Map<String, String> users = new HashMap<>(); // 存储用户名和密码的地图
 
+
+    public JTextArea getJta(){
+        return jta;
+    }
     public ServerChar() {
         this.setTitle("服务端"); // 设置窗口标题为“服务端”
         jta = new JTextArea(); // 初始化文本区域
